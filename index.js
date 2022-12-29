@@ -14,7 +14,13 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 console.log(uri)
 async function run() {
     try {
+        const postCollection = client.db('qzonemdeia').collection('postData')
 
+        app.post('/addpost', async (req, res) => {
+            const data = req.body
+            const result = await postCollection.insertOne(data)
+            res.send(result)
+        })
     }
     finally {
 
