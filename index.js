@@ -14,6 +14,8 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         const postCollection = client.db('qzonemdeia').collection('postData')
+        const commentCollection = client.db('qzonemdeia').collection('commentData')
+        const userCollection = client.db('qzonemdeia').collection('userData')
 
         app.post('/addpost', async (req, res) => {
             const data = req.body
@@ -29,16 +31,35 @@ async function run() {
 
         app.get('/postdetails/:id', async (req, res) => {
             const id = req.params.id
-            console.log(id)
             const query = {
                 _id: ObjectId(id)
             }
-            console.log(query)
             const post = await postCollection.findOne(query)
             res.send(post)
         })
 
+        app.post('/comment', async (req, res) => {
+            const data = req.body
+            const result = await commentCollection.insertOne(data)
+            res.send(result)
+        })
 
+        app.get('/comment/:id', async (req, res) => {
+            const id = req.params.id
+            console.log(id)
+            const query = {
+                postId: id
+            }
+            const result = await commentCollection.find(query).toArray()
+            res.send(result)
+        })
+
+        app.post('/user', async (req, res) => {
+            const user = req.body
+            const result = await userCollection.insertOne(user)
+            res.send(result)
+
+        })
     }
     finally {
 
