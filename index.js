@@ -28,6 +28,12 @@ async function run() {
             const posts = await postCollection.find(query).toArray()
             res.send(posts)
         })
+        app.get('/homeposts', async (req, res) => {
+            const query = {}
+            const posts = postCollection.find(query).sort({ react: -1 })
+            const result = await posts.toArray()
+            res.send(result)
+        })
 
         app.get('/postdetails/:id', async (req, res) => {
             const id = req.params.id
@@ -59,6 +65,22 @@ async function run() {
             const result = await userCollection.insertOne(user)
             res.send(result)
 
+        })
+
+        app.put('/updateLike/:id', async (req, res) => {
+            const reactorInfo = req.body
+            const id = req.params.id
+            console.log(id, reactorInfo)
+            const result = await postCollection.updateOne({
+                "_id": ObjectId(id),
+                "reactor": { "$ne": reactorInfo.userEmail }
+            },
+                {
+                    "$inc": { "react": 1 },
+                    "$push": { "reactor": reactorInfo.userEmail }
+                }
+            )
+            res.send(result)
         })
     }
     finally {
